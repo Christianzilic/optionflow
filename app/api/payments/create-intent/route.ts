@@ -3,7 +3,7 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import Stripe from "stripe";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+function getStripe() { return new Stripe(process.env.STRIPE_SECRET_KEY!); }
 
 export async function POST(request: NextRequest) {
   const session = await auth();
@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
   // Ensure Stripe customer exists
   let stripeCustomerId = (await prisma.user.findUnique({ where: { id: session.user.id } }))?.stripeCustomerId;
   if (!stripeCustomerId) {
-    const customer = await stripe.customers.create({
+    const customer = await getStripe().customers.create({
       email: session.user.email,
       name: session.user.name ?? undefined,
       metadata: { userId: session.user.id },
@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
     await prisma.user.update({ where: { id: session.user.id }, data: { stripeCustomerId } });
   }
 
-  const intent = await stripe.paymentIntents.create({
+  const intent = await getStripe().paymentIntents.create({
     amount: amountCents,
     currency: "aud",
     customer: stripeCustomerId,
