@@ -1,0 +1,418 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── ENUMS ────────────────────────────────────────────────────────────────────
+
+enum UserRole {
+  HOMEOWNER
+  DEVELOPER
+  ADMIN
+}
+
+enum AustralianState {
+  NSW
+  VIC
+  QLD
+  WA
+  SA
+  TAS
+  ACT
+  NT
+}
+
+enum PropertyStatus {
+  DRAFT
+  SUBMITTED
+  UNDER_REVIEW
+  APPROVED
+  OPTION_ACTIVE
+  LISTED
+  OFFER_RECEIVED
+  UNDER_CONTRACT
+  ASSIGNED
+  REJECTED
+  OPTION_EXPIRED
+  WITHDRAWN
+}
+
+enum OptionDeedStatus {
+  DRAFT
+  SENT_FOR_SIGNING
+  SIGNED
+  ACTIVE
+  EXPIRED
+  CANCELLED
+}
+
+enum AssignmentDeedStatus {
+  DRAFT
+  SENT_FOR_SIGNING
+  SIGNED
+  COMPLETED
+  VOIDED
+}
+
+enum PaymentStatus {
+  PENDING
+  PROCESSING
+  SUCCEEDED
+  FAILED
+  REFUNDED
+}
+
+enum DeveloperOfferStatus {
+  PENDING
+  UNDER_NEGOTIATION
+  ACCEPTED
+  REJECTED
+  WITHDRAWN
+}
+
+// ─── USERS ────────────────────────────────────────────────────────────────────
+
+model User {
+  id               String    @id @default(cuid())
+  email            String    @unique
+  emailVerified    DateTime?
+  name             String?
+  phone            String?
+  role             UserRole  @default(HOMEOWNER)
+  image            String?
+  passwordHash     String?
+  stripeCustomerId String?   @unique
+  tosAcceptedAt    DateTime?
+
+  homeownerProfile HomeownerProfile?
+  developerProfile DeveloperProfile?
+
+  accounts         Account[]
+  sessions         Session[]
+
+  submittedProperties Property[]         @relation("SubmittedBy")
+  developerOffers     DeveloperOffer[]
+  enquiries           DeveloperEnquiry[]
+  auditLogs           AuditLog[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model HomeownerProfile {
+  id          String  @id @default(cuid())
+  userId      String  @unique
+  user        User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  legalName   String?
+  isCompany   Boolean @default(false)
+  companyName String?
+  abn         String?
+  acn         String?
+
+  solicitorName  String?
+  solicitorEmail String?
+  solicitorPhone String?
+
+  bankBsb     String?
+  bankAccount String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model DeveloperProfile {
+  id            String            @id @default(cuid())
+  userId        String            @unique
+  user          User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  companyName   String?
+  abn           String?
+  acn           String?
+  licenseNumber String?
+  isVerified    Boolean           @default(false)
+
+  preferredStates   AustralianState[]
+  preferredMinPrice Int?
+  preferredMaxPrice Int?
+  preferredTypes    String[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expires      DateTime
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ─── PROPERTY ─────────────────────────────────────────────────────────────────
+
+model Property {
+  id     String         @id @default(cuid())
+  status PropertyStatus @default(DRAFT)
+
+  ownerId    String
+  owner      User    @relation("SubmittedBy", fields: [ownerId], references: [id])
+  adminNotes String? @db.Text
+
+  streetAddress  String
+  suburb         String
+  state          AustralianState
+  postcode       String
+  lotNumber      String?
+  planNumber     String?
+  titleReference String?
+  latitude       Decimal? @db.Decimal(10, 7)
+  longitude      Decimal? @db.Decimal(10, 7)
+
+  landAreaSqm         Int?
+  currentZoning       String?
+  proposedZoning      String?
+  propertyType        String  @default("house")
+  bedroomCount        Int?
+  bathroomCount       Int?
+  carSpaces           Int?
+  yearBuilt           Int?
+  currentUse          String? @db.Text
+  proposedDevelopment String? @db.Text
+
+  homeownerAskingPrice Int?
+  agreedOptionPrice    Int?
+  optionFeeAmount      Int?
+  adminListPrice       Int?
+  adminDescription     String? @db.Text
+
+  feasibilityNotes  String? @db.Text
+  feasibilityData   Json?
+  stateSpecificData Json?
+
+  legalAckAt DateTime?
+
+  documents       PropertyDocument[]
+  optionDeed      OptionDeed?
+  assignmentDeed  AssignmentDeed?
+  developerOffers DeveloperOffer[]
+  enquiries       DeveloperEnquiry[]
+  payments        Payment[]
+
+  submittedAt DateTime?
+  approvedAt  DateTime?
+  listedAt    DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model PropertyDocument {
+  id         String   @id @default(cuid())
+  propertyId String
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  name         String
+  type         String
+  storageKey   String
+  mimeType     String
+  sizeBytes    Int
+  isPublic     Boolean @default(false)
+  uploadedById String
+
+  createdAt DateTime @default(now())
+}
+
+// ─── OPTION DEED ──────────────────────────────────────────────────────────────
+
+model OptionDeed {
+  id         String           @id @default(cuid())
+  propertyId String           @unique
+  property   Property         @relation(fields: [propertyId], references: [id])
+  status     OptionDeedStatus @default(DRAFT)
+
+  grantor_legalName String
+  grantor_address   String
+  grantor_abn       String?
+  grantee_legalName String
+  grantee_abn       String?
+  grantee_address   String
+
+  state                AustralianState
+  optionFeeAmount      Int
+  optionPrice          Int
+  commencementDate     DateTime
+  expiryDate           DateTime
+  extensionDays        Int?
+  extensionFeeAmount   Int?
+  specialConditions    String? @db.Text
+  stateSpecificClauses Json?
+
+  draftPdfKey  String?
+  signedPdfKey String?
+
+  docusignEnvelopeId String? @unique
+  docusignStatus     String?
+  sentAt             DateTime?
+  signedAt           DateTime?
+
+  depositPayment Payment? @relation("OptionDeedDeposit")
+
+  expiryWarning30Sent Boolean @default(false)
+  expiryWarning7Sent  Boolean @default(false)
+  expiryWarning1Sent  Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ─── ASSIGNMENT DEED ──────────────────────────────────────────────────────────
+
+model AssignmentDeed {
+  id         String               @id @default(cuid())
+  propertyId String               @unique
+  property   Property             @relation(fields: [propertyId], references: [id])
+  status     AssignmentDeedStatus @default(DRAFT)
+
+  assignor_legalName String
+  assignor_abn       String?
+  assignor_address   String
+  assignee_legalName String
+  assignee_abn       String?
+  assignee_address   String
+
+  state                AustralianState
+  originalOptionPrice  Int
+  assignmentPrice      Int
+  adminMargin          Int
+  developerDeposit     Int
+  assignmentDate       DateTime
+  completionDate       DateTime
+  stateSpecificClauses Json?
+
+  draftPdfKey  String?
+  signedPdfKey String?
+
+  docusignEnvelopeId String? @unique
+  docusignStatus     String?
+  sentAt             DateTime?
+  signedAt           DateTime?
+
+  developerDepositPayment Payment? @relation("AssignmentDeedDeposit")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ─── DEVELOPER INTERACTIONS ───────────────────────────────────────────────────
+
+model DeveloperOffer {
+  id          String               @id @default(cuid())
+  propertyId  String
+  property    Property             @relation(fields: [propertyId], references: [id])
+  developerId String
+  developer   User                 @relation(fields: [developerId], references: [id])
+  status      DeveloperOfferStatus @default(PENDING)
+
+  offerPrice         Int
+  depositAmount      Int?
+  proposedSettlement DateTime?
+  conditions         String? @db.Text
+  developerNotes     String? @db.Text
+  adminNotes         String? @db.Text
+  legalAckAt         DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model DeveloperEnquiry {
+  id         String   @id @default(cuid())
+  propertyId String
+  property   Property @relation(fields: [propertyId], references: [id])
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+  message    String   @db.Text
+  adminReply String?  @db.Text
+  repliedAt  DateTime?
+  createdAt  DateTime @default(now())
+}
+
+// ─── PAYMENTS ─────────────────────────────────────────────────────────────────
+
+model Payment {
+  id         String        @id @default(cuid())
+  propertyId String
+  property   Property      @relation(fields: [propertyId], references: [id])
+  status     PaymentStatus @default(PENDING)
+
+  stripePaymentIntentId String? @unique
+  stripeChargeId        String?
+  amount                Int
+  currency              String  @default("aud")
+  description           String
+
+  optionDeedId     String?         @unique
+  optionDeed       OptionDeed?     @relation("OptionDeedDeposit", fields: [optionDeedId], references: [id])
+  assignmentDeedId String?         @unique
+  assignmentDeed   AssignmentDeed? @relation("AssignmentDeedDeposit", fields: [assignmentDeedId], references: [id])
+
+  paidAt     DateTime?
+  refundedAt DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+}
+
+// ─── AUDIT & NOTIFICATIONS ────────────────────────────────────────────────────
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  userId     String?
+  user       User?    @relation(fields: [userId], references: [id])
+  action     String
+  entityType String
+  entityId   String
+  metadata   Json?
+  ipAddress  String?
+  createdAt  DateTime @default(now())
+}
+
+model EmailLog {
+  id         String   @id @default(cuid())
+  to         String
+  subject    String
+  templateId String
+  metadata   Json?
+  resendId   String?
+  status     String   @default("sent")
+  createdAt  DateTime @default(now())
+}

@@ -1,0 +1,13 @@
+{
+  "framework": "nextjs",
+  "buildCommand": "npx prisma generate && next build",
+  "installCommand": "npm install",
+  "functions": {
+    "app/api/webhooks/**": {
+      "maxDuration": 30
+    },
+    "app/api/**": {
+      "maxDuration": 15
+    }
+  }
+}
