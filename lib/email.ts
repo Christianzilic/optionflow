@@ -2,7 +2,7 @@ import "server-only";
 import { Resend } from "resend";
 import { prisma } from "@/lib/prisma";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+function getResend() { return new Resend(process.env.RESEND_API_KEY); }
 const FROM = process.env.RESEND_FROM_EMAIL ?? "noreply@optionflow.com.au";
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
 const FOOTER = `<p style="color:#9ca3af;font-size:12px;margin-top:32px;">OptionFlow · ${process.env.PLATFORM_ABN ?? ""} · This email does not constitute legal advice.</p>`;
@@ -27,7 +27,7 @@ async function logEmail(to: string, template: EmailTemplate, subject: string, me
 }
 
 async function send(to: string, subject: string, html: string, template: EmailTemplate) {
-  const { data, error } = await resend.emails.send({ from: FROM, to, subject, html });
+  const { data, error } = await getResend().emails.send({ from: FROM, to, subject, html });
   await logEmail(to, template, subject, data?.id);
   if (error) console.error("[email] send failed", error);
 }
