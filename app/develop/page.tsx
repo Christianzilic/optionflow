@@ -175,6 +175,32 @@ export default function DevelopPage() {
         </div>
       </section>
 
+      {/* About */}
+      <section className="bg-white border-t border-slate-100 py-16 px-6">
+        <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-12 items-start">
+          <div>
+            <h3 className="text-xl font-bold text-[#0f2240] mb-3">About Devbud.</h3>
+            <p className="text-slate-500 text-sm leading-relaxed">
+              Devbud. is an Australian property group sourcing and curating development sites across all states and territories. Every listing on our marketplace has been independently assessed for development feasibility before it reaches our developer network.
+            </p>
+          </div>
+          <div>
+            <h3 className="text-xl font-bold text-[#0f2240] mb-3">Finance Partner</h3>
+            <p className="text-slate-500 text-sm leading-relaxed mb-4">
+              Development finance arranged by <strong className="text-[#0f2240]">All Credit Solutions</strong> — specialist private lending brokers with 15+ years experience and $7B+ in settlements. Construction finance, bridging, and commercial lending from $500K to $50M.
+            </p>
+            <a
+              href="https://www.allcreditsolutions.com.au"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 text-sm font-semibold text-[#c9a455] hover:text-[#b8933f] transition-colors"
+            >
+              Visit All Credit Solutions →
+            </a>
+          </div>
+        </div>
+      </section>
+
       {/* Footer */}
       <footer className="bg-[#0a1828] py-6 px-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500">
         <span>© {new Date().getFullYear()} Devbud. All rights reserved.</span>
