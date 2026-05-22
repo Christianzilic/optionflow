@@ -63,12 +63,12 @@ function LoginForm() {
       <div className="hidden lg:flex flex-col justify-between w-1/2 bg-[#0f2240] p-12">
         <Link href="/" className="flex items-center gap-2.5">
           <Building2 className="h-6 w-6 text-[#c9a455]" />
-          <span className="text-xl font-bold text-white">OptionFlow</span>
+          <span className="text-xl font-bold text-white">Devbud.</span>
         </Link>
         <div>
           <p className="text-3xl font-bold text-white leading-snug mb-4">
-            Unlock your property&apos;s<br />
-            <span className="text-[#c9a455]">development potential</span>
+            Purchase with confidence.<br />
+            <span className="text-[#c9a455]">Develop with clarity.</span>
           </p>
           <p className="text-slate-300 text-sm">
             Managing call option deeds for property owners and developers across all Australian states and territories.
@@ -83,7 +83,7 @@ function LoginForm() {
           <div className="flex justify-center mb-8 lg:hidden">
             <Link href="/" className="flex items-center gap-2">
               <Building2 className="h-6 w-6 text-[#c9a455]" />
-              <span className="text-xl font-bold text-[#0f2240]">OptionFlow</span>
+              <span className="text-xl font-bold text-[#0f2240]">Devbud.</span>
             </Link>
           </div>
 

@@ -278,7 +278,7 @@ export default function NewPropertyPage() {
                   className="mt-0.5 h-4 w-4 rounded border-zinc-300 text-blue-600"
                 />
                 <span className="text-xs text-zinc-500 leading-relaxed">
-                  I acknowledge that I have read the legal disclaimer and understand that OptionFlow does not provide legal advice. I have had the opportunity to seek independent legal advice before submitting this property. I confirm I am the owner or authorised representative for this property.
+                  I acknowledge that I have read the legal disclaimer and understand that Devbud. does not provide legal advice. I have had the opportunity to seek independent legal advice before submitting this property. I confirm I am the owner or authorised representative for this property.
                 </span>
               </label>
             </div>

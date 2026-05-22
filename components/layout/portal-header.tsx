@@ -22,7 +22,7 @@ export function PortalHeader({ userName, userEmail, profileHref }: PortalHeaderP
     <header className="h-14 border-b bg-white flex items-center px-4 sm:px-6 justify-between sticky top-0 z-40">
       <Link href="/" className="flex items-center gap-2">
         <Building2 className="h-5 w-5 text-blue-600" />
-        <span className="font-bold text-zinc-900">OptionFlow</span>
+        <span className="font-bold text-zinc-900">Devbud.</span>
       </Link>
       <DropdownMenu>
         <DropdownMenuTrigger className="flex h-9 items-center gap-2 rounded-md px-3 text-sm hover:bg-zinc-100 transition-colors">

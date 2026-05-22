@@ -6,8 +6,8 @@ import { Toaster } from "@/components/ui/sonner";
 const geist = Geist({ subsets: ["latin"], variable: "--font-geist" });
 
 export const metadata: Metadata = {
-  title: "OptionFlow — Property Development Options | Powered by All Credit Solutions",
-  description: "OptionFlow connects Australian property owners with developers via call option deeds. Development finance arranged by All Credit Solutions — $500K–$50M, 15+ years experience.",
+  title: "Devbud. — We Purchase Properties. Developers Find Opportunity.",
+  description: "Devbud. purchases Australian properties with confidence and connects developers with curated development sites. Finance arranged by All Credit Solutions.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

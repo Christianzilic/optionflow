@@ -58,12 +58,12 @@ function RegisterForm() {
       <div className="hidden lg:flex flex-col justify-between w-1/2 bg-[#0f2240] p-12">
         <Link href="/" className="flex items-center gap-2.5">
           <Building2 className="h-6 w-6 text-[#c9a455]" />
-          <span className="text-xl font-bold text-white">OptionFlow</span>
+          <span className="text-xl font-bold text-white">Devbud.</span>
         </Link>
         <div>
           <p className="text-3xl font-bold text-white leading-snug mb-4">
-            Join the platform connecting<br />
-            <span className="text-[#c9a455]">owners and developers</span>
+            Purchase with confidence.<br />
+            <span className="text-[#c9a455]">Develop with clarity.</span>
           </p>
           <p className="text-slate-300 text-sm">
             Access Australia&apos;s most efficient property option platform — with development finance arranged by All Credit Solutions.
@@ -78,12 +78,12 @@ function RegisterForm() {
           <div className="flex justify-center mb-8 lg:hidden">
             <Link href="/" className="flex items-center gap-2">
               <Building2 className="h-6 w-6 text-[#c9a455]" />
-              <span className="text-xl font-bold text-[#0f2240]">OptionFlow</span>
+              <span className="text-xl font-bold text-[#0f2240]">Devbud.</span>
             </Link>
           </div>
 
           <h1 className="text-2xl font-bold text-[#0f2240] mb-1">Create account</h1>
-          <p className="text-sm text-slate-500 mb-6">Join OptionFlow to get started</p>
+          <p className="text-sm text-slate-500 mb-6">Join Devbud. to get started</p>
 
           {/* Role toggle */}
           <div className="grid grid-cols-2 gap-2 mb-6">
